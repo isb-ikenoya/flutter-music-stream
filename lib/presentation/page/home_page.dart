@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_stream/presentation/component/app_notifier_overlay.dart';
+import 'package:flutter_music_stream/presentation/component/custom_mini_player.dart';
 import 'package:flutter_music_stream/presentation/navigation/footer_navigator.dart';
 import 'package:flutter_music_stream/presentation/notifier/navigation_notifier.dart';
 import 'package:flutter_music_stream/presentation/page/music_list_page.dart';
@@ -17,16 +18,15 @@ class HomePage extends ConsumerWidget {
     const List<Widget> display = [MusicListPage(), SecondPage()];
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(title),
-      ),
-      body: Center(
-        child: SizedBox.expand(
-          child: AppNotifierOverlay(
-            child: display[navigationState.selectedIndex],
+      body: Stack(
+        children: [
+          SizedBox.expand(
+            child: AppNotifierOverlay(
+              child: display[navigationState.selectedIndex],
+            ),
           ),
-        ),
+          CustomMiniPlayer()
+        ],
       ),
       bottomNavigationBar: FooterNavigator(),
     );

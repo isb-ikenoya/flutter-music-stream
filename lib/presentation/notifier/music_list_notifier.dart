@@ -21,6 +21,7 @@ class MusicListNotifier extends _$MusicListNotifier {
       MusicInfoState(id: '6', name: 'Song B', url: 'https://example.com/b.mp3'),
       MusicInfoState(id: '7', name: 'Song B', url: 'https://example.com/b.mp3'),
       MusicInfoState(id: '8', name: 'Song B', url: 'https://example.com/b.mp3'),
+      MusicInfoState(id: '9', name: 'Song C', url: 'https://example.com/b.mp3'),
     ];
   }
 
