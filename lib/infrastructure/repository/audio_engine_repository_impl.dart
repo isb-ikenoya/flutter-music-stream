@@ -21,8 +21,18 @@ class AudioEngineRepositoryImpl implements AudioEngineRepository {
   @override
   Future<void> loadMusic(String url) async {
     try {
+      final currentSource = _player.audioSource;
+      String? currentUrl;
+      if (currentSource is UriAudioSource) {
+        currentUrl = currentSource.uri.toString();
+      }
+
+      // 比較用に正規化
+      final normalizedRequestUrl = Uri.parse(url).toString();
+
       // 既に同じURLがセットされていなければセット（ロード）
-      if (_player.audioSource == null) {
+      if (currentUrl != normalizedRequestUrl) {
+        debugPrint("プリロード開始: $url");
         // preload: true にすることで、setUrlした時点でデータの読み込みを開始する
         await _player.setUrl(url, preload: true);
       }
@@ -34,27 +44,45 @@ class AudioEngineRepositoryImpl implements AudioEngineRepository {
   @override
   Future<void> play(String url) async {
     try {
-      print("現在の状態: ${_player.processingState}");
-      print("現在の位置: ${_player.position}");
+      final currentSource = _player.audioSource;
+      String? currentUrl;
 
-      if (_player.processingState == ProcessingState.completed) {
-        // 終わっていれば再生位置を最初に戻す
-        await _player.seek(Duration.zero);
-        // 念のため、少し待機（OSレベルのプレイヤーの準備時間を稼ぐ）
-        await Future.delayed(const Duration(milliseconds: 50));
+      if (currentSource is UriAudioSource) {
+        currentUrl = currentSource.uri.toString();
       }
 
-      // すでに同じURLがセットされているか確認
-      // 違うURLならロードし直し、同じなら単に再生（再開）
-      if (_player.audioSource == null) {
-        print("URLセット");
+      // 比較用に正規化。just_audio内部で保持される形式に合わせるため。
+      // ただし setUrl には元の url を渡す（二重エンコードによる404防止）。
+      final normalizedRequestUrl = Uri.parse(url).toString();
+
+      debugPrint("--- Play Request ---");
+      debugPrint("Request URL: $url");
+      debugPrint("Current URL: $currentUrl");
+
+      // 1. 別の楽曲が要求された場合、または何もセットされていない場合
+      if (currentUrl != normalizedRequestUrl) {
+        debugPrint("別の曲を検出。読み込みを開始します。");
+        // setUrl() は内部で前の接続を適切に破棄するため、明示的な stop() は不要。
+        // stop() を呼ぶとリソース解放のタイミングで競合し、404 エラーを誘発することがあります。
         await _player.setUrl(url);
       }
+      // 2. 同じ曲で完了状態（再生終了済み）の場合
+      else if (_player.processingState == ProcessingState.completed) {
+        debugPrint("曲の終端のため、最初に戻ります");
+        await _player.seek(Duration.zero);
+      } else {
+        debugPrint("同じURLのため、現在の位置から再開します");
+      }
 
-      // 再生（停止位置から再開される）
-      await _player.play();
-    } catch (e) {
-      print("再生エラー: $e");
+      // 3. 再生を開始（まだ再生していない場合のみ）
+      if (!_player.playing) {
+        await _player.play();
+      }
+    } catch (e, stackTrace) {
+      // 404が出る場合は、デバッグログの「要求URL」をブラウザ等で開きアクセス可能か確認してください
+      debugPrint("再生エラー (404等): $e");
+      debugPrint("エラー対象URL: $url");
+      debugPrint(stackTrace.toString());
     }
   }
 

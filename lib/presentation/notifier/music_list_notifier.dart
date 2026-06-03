@@ -11,10 +11,14 @@ class MusicListNotifier extends _$MusicListNotifier {
     return [
       MusicInfoState(
         id: '1',
-        name: 'Song A',
-        url: 'https://example.com/a.m3u8',
+        name: 'メヌエット',
+        url: 'https://www.ne.jp/asahi/music/myuu/wave/menuettm.mp3',
       ),
-      MusicInfoState(id: '2', name: 'Song B', url: 'https://example.com/b.mp3'),
+      MusicInfoState(
+        id: '2',
+        name: 'アイネ・クライネ・ナハトムジーク',
+        url: 'https://www.ne.jp/asahi/music/myuu/wave/eine.mp3',
+      ),
       MusicInfoState(id: '3', name: 'Song B', url: 'https://example.com/b.mp3'),
       MusicInfoState(id: '4', name: 'Song B', url: 'https://example.com/b.mp3'),
       MusicInfoState(id: '5', name: 'Song B', url: 'https://example.com/b.mp3'),

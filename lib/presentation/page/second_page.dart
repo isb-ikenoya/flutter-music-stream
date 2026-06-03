@@ -9,11 +9,11 @@ class SecondPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Future.microtask(() {
+    /*Future.microtask(() {
       ref
           .read(audioControllerProvider)
           .loadMusic("https://www.ne.jp/asahi/music/myuu/wave/menuettm.mp3");
-    });
+    });*/
 
     return Scaffold(
       appBar: AppBar(backgroundColor: Colors.blue, title: const Text('テスト')),
